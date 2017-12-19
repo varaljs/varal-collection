@@ -1,10 +1,11 @@
 {
   "name": "varal-collection",
-  "version": "1.0.0",
-  "description": "",
+  "version": "1.0.1",
+  "description": "Method Chaining Collection",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "scripts": {},
+  "engines": {
+    "node": ">= 7.6.0"
   },
   "repository": {
     "type": "git",
@@ -18,5 +19,10 @@
   "bugs": {
     "url": "https://github.com/varaljs/varal-collection/issues"
   },
-  "homepage": "https://github.com/varaljs/varal-collection#readme"
+  "homepage": "https://github.com/varaljs/varal-collection#readme",
+  "files": [
+    "README.md",
+    "index.js",
+    "object.js"
+  ]
 }
