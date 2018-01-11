@@ -10,8 +10,14 @@ class Collection {
             this.data = initData(data);
     }
 
-    get() {
-        return this.data;
+    get(num) {
+        if (typeof num === 'number')
+            if (num === 1)
+                return this.data[0];
+            else
+                return this.data.slice(0, num);
+        else
+            return this.data;
     }
 
     avg(key) {
@@ -41,6 +47,24 @@ class Collection {
             newData.push(item);
         }
         return new Collection(newData, noInit);
+    }
+
+    combine(by, key, value) {
+        let self = this;
+        let bys = [];
+        let data = [];
+        for (let item of self.data)
+            if (bys.indexOf(item[by]) < 0)
+                bys.push(item[by]);
+        for (let byValue of bys) {
+            let item = {};
+            item[by] = byValue;
+            self.where(by, byValue).tap(obj => {
+                item[obj[key]] = obj[value];
+            });
+            data.push(item);
+        }
+        return new Collection(data);
     }
 
     contains(key, value) {
@@ -314,7 +338,7 @@ class Collection {
 
     sortBy(key, method) {
         let collection = this.clone();
-        if (typeof method === "string")
+        if (typeof method === 'string')
             method = method.toLowerCase();
         method = method === 'desc' ? -1 : 1;
         collection.data.sort((x, y) => {
@@ -370,7 +394,7 @@ class Collection {
     }
 
     where(key, op, value) {
-        if (!value) {
+        if (value === undefined) {
             value = op;
             op = '=';
         }
