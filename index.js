@@ -417,6 +417,10 @@ class Collection {
         })
     }
 
+    [Symbol.iterator]() {
+        return this.data[Symbol.iterator]();
+    }
+
 }
 
 const initData = arr => {
