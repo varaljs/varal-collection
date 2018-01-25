@@ -49,20 +49,33 @@ class Collection {
         return new Collection(newData, noInit);
     }
 
-    combine(by, key, value) {
+    combine(key, value) {
         let self = this;
-        let bys = [];
+        let map = new Map();
         let data = [];
-        for (let item of self.data)
-            if (bys.indexOf(item[by]) < 0)
-                bys.push(item[by]);
-        for (let byValue of bys) {
-            let item = {};
-            item[by] = byValue;
-            self.where(by, byValue).tap(obj => {
-                item[obj[key]] = obj[value];
-            });
-            data.push(item);
+        for (let item of self.data) {
+            let mapKey = '';
+            for (let itemKey in item)
+                if (item.hasOwnProperty(itemKey) && itemKey !== key && itemKey !== value)
+                    mapKey += `${itemKey}:${item[itemKey]};`;
+            if (map.has(mapKey))
+                map.get(mapKey).push(item);
+            else
+                map.set(mapKey, [item]);
+        }
+        for (let items of map.values()) {
+            let first = true;
+            const datum = {};
+            for (let item of items) {
+                if (first) {
+                    first = false;
+                    for (let itemKey in item)
+                        if (item.hasOwnProperty(itemKey) && itemKey !== key && itemKey !== value)
+                            datum[itemKey] = item[itemKey];
+                }
+                datum[item[key]] = item[value];
+            }
+            data.push(datum);
         }
         return new Collection(data);
     }
