@@ -362,9 +362,13 @@ class Collection {
         return collection;
     }
 
-    splice(start, deleteCount) {
+    splice(start, deleteCount, ...items) {
         deleteCount = deleteCount || this.data.length - start;
-        let data = this.data.splice(start, deleteCount);
+        const $items = [];
+        for (let item of items)
+            if (typeof item === 'object')
+                $items.push(new CollectionObj(item));
+        const data = this.data.splice(start, deleteCount, ...$items);
         return new Collection(data, noInit);
     }
 

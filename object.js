@@ -34,6 +34,7 @@ class CollectionObj {
 
     forget(key) {
         delete this[key];
+        return this;
     }
 
     keys() {
@@ -69,23 +70,10 @@ class CollectionObj {
 
     [Symbol.iterator]() {
         let data = [];
-        let index = 0;
         for (let key in this)
             if (this.hasOwnProperty(key))
-                data.push(this[key]);
-        return {
-            next: function () {
-                if (index >= data.length)
-                    return {
-                        value: undefined,
-                        done: true
-                    };
-                return {
-                    value: data[index++],
-                    done: false
-                };
-            }
-        };
+                data.push([key, this[key]]);
+        return data[Symbol.iterator]();
     }
 
 }
