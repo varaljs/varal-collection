@@ -471,3 +471,4 @@ const opFilter = (item, op, value) => {
 };
 
 exports = module.exports = Collection;
+exports.CollectionObj = CollectionObj;
