@@ -4,9 +4,9 @@ const noInit = Symbol();
 class Collection {
 
     constructor(data, model, _noInit) {
-        if (model && typeof model.$isModel === 'function' && model.$isModel() === true) {
+        if (isModel(model)) {
             this.model = model;
-            this.server = model.$getServer();
+            this.server = model.prototype.$getServer();
         } else {
             this.model = CollectionObj;
             this.server = null;
@@ -462,15 +462,24 @@ const initData = (arr, model, server) => {
     return data;
 };
 
+const isModel = (model) => {
+    if (model)
+        if (model.prototype)
+            if (typeof model.prototype.$isModel === 'function')
+                if (model.prototype.$isModel())
+                    return true;
+    return false;
+};
+
 const newModel = (data, model, server) => {
     if (model === CollectionObj)
         return new model(data);
     else {
-        class _model extends model {
+        class Model extends model {
         }
 
-        _model.prototype.$getServer = () => server;
-        return new _model(data);
+        Model.prototype.$getServer = () => server;
+        return new Model(data);
     }
 };
 
