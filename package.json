@@ -1,6 +1,6 @@
 {
   "name": "varal-collection",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Method Chaining Collection",
   "main": "index.js",
   "scripts": {},

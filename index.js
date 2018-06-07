@@ -463,8 +463,15 @@ const initData = (arr, model, server) => {
 };
 
 const newModel = (data, model, server) => {
-    model = new model(data);
-    model.$getServer = () => server;
+    if (model === CollectionObj)
+        return new model(data);
+    else {
+        class _model extends model {
+        }
+
+        _model.prototype.$getServer = () => server;
+        return new _model(data);
+    }
 };
 
 const opFilter = (item, op, value) => {
