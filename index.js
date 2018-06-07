@@ -3,15 +3,16 @@ const noInit = Symbol();
 
 class Collection {
 
-    constructor(data, model, _noInit) {
+    constructor(data, model, server, _noInit) {
         if (model && typeof model.isModel === 'function' && model.isModel() === true)
             this.model = model;
         else
             this.model = CollectionObj;
+        this.server = server;
         if (_noInit === noInit)
             this.data = data;
         else
-            this.data = initData(data, this.model);
+            this.data = initData(data, this.model, this.server);
     }
 
     get(num) {
@@ -47,7 +48,7 @@ class Collection {
     clone() {
         let newData = [];
         for (let item of this.data) {
-            item = new this.model(item);
+            item = newModel(item, this.model, this.server);
             newData.push(item);
         }
         return this._new(newData);
@@ -107,7 +108,7 @@ class Collection {
 
     every(callback) {
         for (let item of this.data) {
-            item = new this.model(item);
+            item = newModel(item, this.model, this.server);
             let res = callback(item);
             if (res === false)
                 return false;
@@ -118,7 +119,7 @@ class Collection {
     except(keys) {
         let newData = [];
         for (let item of this.data) {
-            item = new this.model(item);
+            item = newModel(item, this.model, this.server);
             for (let key of keys)
                 delete item[key];
             newData.push(item);
@@ -129,7 +130,7 @@ class Collection {
     filter(callback) {
         let newData = [];
         for (let item of this.data) {
-            item = new this.model(item);
+            item = newModel(item, this.model, this.server);
             let res = callback(item);
             if (res === true)
                 newData.push(item);
@@ -139,7 +140,7 @@ class Collection {
 
     first(callback) {
         for (let item of this.data) {
-            item = new this.model(item);
+            item = newModel(item, this.model, this.server);
             let res = callback(item);
             if (res === true)
                 return item;
@@ -152,9 +153,9 @@ class Collection {
         for (let item of this.data) {
             let name = item[key];
             if (Array.isArray(data[name]))
-                data[name].push(new this.model(item));
+                data[name].push(newModel(item, this.model, this.server));
             else
-                data[name] = [new this.model(item)];
+                data[name] = [newModel(item, this.model, this.server)];
         }
         return data;
     }
@@ -185,7 +186,7 @@ class Collection {
     last(callback) {
         let data = this.data.slice().reverse();
         for (let item of data) {
-            item = new this.model(item);
+            item = newModel(item, this.model, this.server);
             let res = callback(item);
             if (res === true)
                 return item;
@@ -212,7 +213,7 @@ class Collection {
     nth(n) {
         let newData = [];
         for (let i = 0; i < this.data.length; i += n)
-            newData.push(new this.model(this.data[i]));
+            newData.push(newModel(this.data[i], this.model, this.server));
         return this._new(newData);
     }
 
@@ -223,7 +224,7 @@ class Collection {
             for (let key of keys)
                 if (item[key] !== undefined)
                     newItem[key] = item[key];
-            newItem = new this.model(newItem);
+            newItem = newModel(newItem, this.model, this.server);
             newData.push(newItem);
         }
         return this._new(newData);
@@ -246,7 +247,7 @@ class Collection {
         let dataTrue = [];
         let dataFalse = [];
         for (let item of this.data) {
-            item = new this.model(item);
+            item = newModel(item, this.model, this.server);
             let res = callback(item);
             if (res === true)
                 dataTrue.push(item);
@@ -271,7 +272,7 @@ class Collection {
     prepend(item) {
         let collection = this.clone();
         if (typeof item === 'object')
-            collection.data.unshift(new this.model(item));
+            collection.data.unshift(newModel(item, this.model, this.server));
         else
             throw new Error('The Member of Collection expected Object,' + typeof item + ' given');
         return collection;
@@ -280,7 +281,7 @@ class Collection {
     push(item) {
         let collection = this.clone();
         if (typeof item === 'object')
-            collection.data.push(new this.model(item));
+            collection.data.push(newModel(item, this.model, this.server));
         else
             throw new Error('The Member of Collection expected Object,' + typeof item + ' given');
         return collection;
@@ -299,7 +300,7 @@ class Collection {
     reject(callback) {
         let newData = [];
         for (let item of this.data) {
-            item = new this.model(item);
+            item = newModel(item, this.model, this.server);
             let res = callback(item);
             if (res !== true)
                 newData.push(item);
@@ -339,7 +340,7 @@ class Collection {
 
     some(callback) {
         for (let item of this.data) {
-            item = new this.model(item);
+            item = newModel(item, this.model, this.server);
             let res = callback(item);
             if (res === true)
                 return true;
@@ -371,7 +372,7 @@ class Collection {
         const $items = [];
         for (let item of items)
             if (typeof item === 'object')
-                $items.push(new this.model(item));
+                $items.push(newModel(item, this.model, this.server));
         const data = this.data.splice(start, deleteCount, ...$items);
         return this._new(data);
     }
@@ -439,7 +440,7 @@ class Collection {
     }
 
     _new(data) {
-        return new Collection(data, this.model, noInit);
+        return new Collection(data, this.model, this.server, noInit);
     }
 
     [Symbol.iterator]() {
@@ -448,15 +449,20 @@ class Collection {
 
 }
 
-const initData = (arr, model) => {
+const initData = (arr, model, server) => {
     let data = [];
     for (let item of arr) {
         if (typeof item === 'object')
-            data.push(new model(item));
+            data.push(newModel(item, model, server));
         else
             throw new Error('The Member of Collection expected Object,' + typeof item + ' given');
     }
     return data;
+};
+
+const newModel = (data, model, server) => {
+    model = new model(data);
+    model.getServer = () => server;
 };
 
 const opFilter = (item, op, value) => {
