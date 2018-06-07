@@ -4,7 +4,7 @@ class CollectionObj {
         Object.assign(this, obj);
     }
 
-    toMap() {
+    $toMap() {
         let map = new Map();
         for (let key in this)
             if (this.hasOwnProperty(key))
@@ -12,11 +12,11 @@ class CollectionObj {
         return map;
     }
 
-    toJson() {
+    $toJson() {
         return JSON.stringify(this);
     }
 
-    diff(target) {
+    $diff(target) {
         let data = {};
         for (let key in this)
             if (this.hasOwnProperty(key) && this[key] !== target[key])
@@ -24,7 +24,7 @@ class CollectionObj {
         return new CollectionObj(data);
     }
 
-    except(keys) {
+    $except(keys) {
         let data = {};
         for (let key in this)
             if (this.hasOwnProperty(key) && keys.indexOf(key) < 0)
@@ -32,12 +32,12 @@ class CollectionObj {
         return new CollectionObj(data);
     }
 
-    forget(key) {
+    $forget(key) {
         delete this[key];
         return this;
     }
 
-    keys() {
+    $keys() {
         let data = [];
         for (let key in this)
             if (this.hasOwnProperty(key))
@@ -45,7 +45,7 @@ class CollectionObj {
         return data;
     }
 
-    same(target) {
+    $same(target) {
         let data = {};
         for (let key in this)
             if (this.hasOwnProperty(key) && this[key] === target[key])
@@ -53,7 +53,7 @@ class CollectionObj {
         return new CollectionObj(data);
     }
 
-    only(keys) {
+    $only(keys) {
         let data = {};
         for (let key in this)
             if (this.hasOwnProperty(key) && keys.indexOf(key) >= 0)
@@ -61,7 +61,7 @@ class CollectionObj {
         return new CollectionObj(data);
     }
 
-    values() {
+    $values() {
         let data = [];
         for (let value of this)
             data.push(value);
