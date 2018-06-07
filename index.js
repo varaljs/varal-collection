@@ -3,12 +3,14 @@ const noInit = Symbol();
 
 class Collection {
 
-    constructor(data, model, server, _noInit) {
-        if (model && typeof model.isModel === 'function' && model.isModel() === true)
+    constructor(data, model, _noInit) {
+        if (model && typeof model.isModel === 'function' && model.isModel() === true) {
             this.model = model;
-        else
+            this.server = model.getServer();
+        } else {
             this.model = CollectionObj;
-        this.server = server;
+            this.server = null;
+        }
         if (_noInit === noInit)
             this.data = data;
         else
@@ -440,7 +442,7 @@ class Collection {
     }
 
     _new(data) {
-        return new Collection(data, this.model, this.server, noInit);
+        return new Collection(data, this.model, noInit);
     }
 
     [Symbol.iterator]() {
